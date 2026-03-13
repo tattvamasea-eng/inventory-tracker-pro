@@ -1,12 +1,23 @@
 import streamlit as st
 import pandas as pd
-import json
-import base64
 
 # Page config
 st.set_page_config(page_title="Inventory Tracker Pro", page_icon="📦")
 
 st.title("📦 Inventory Tracker Pro")
+
+# Free Website Offer Banner
+st.markdown("""
+🎉 **Special Offer for Mississauga Businesses!**
+
+Need a website for your business? I build them **FREE**!
+
+👉 **Email cram@agentmail.to** to claim your free business website.
+
+*Limited to first 10 Mississauga businesses.*
+
+---
+""")
 
 # Custom JavaScript for localStorage
 st.markdown("""
@@ -47,9 +58,6 @@ if st.session_state.user_id is None:
 # Now we have a user_id - load their data
 user_key = f"inventory_pro_{st.session_state.user_id}"
 
-# Load from localStorage via JavaScript bridge
-# We'll use st.text_area as a workaround for data persistence
-
 # Initialize session state
 if "inventory" not in st.session_state:
     st.session_state.inventory = []
@@ -58,13 +66,9 @@ if "sales" not in st.session_state:
 
 # Data storage helpers
 def load_user_data():
-    """Load data from browser localStorage"""
-    # For now, we'll use session state (works per session)
-    # True localStorage would require custom component
     return st.session_state.inventory, st.session_state.sales
 
 def save_user_data():
-    """Save is automatic in session state"""
     pass
 
 # Get data
@@ -104,14 +108,13 @@ if not df.empty:
     col3.metric("Low Stock Items", len(low_stock))
     col4.metric("Total Revenue", f"${total_revenue:,.2f}")
     
-    # Low stock alert
     if not low_stock.empty:
         st.warning(f"⚠️ {len(low_stock)} items are below reorder level!")
         st.dataframe(low_stock[["Product", "Quantity", "Reorder Level"]], use_container_width=True)
 else:
     total_revenue = 0
 
-# Tabs for different functions
+# Tabs
 tab1, tab2, tab3 = st.tabs(["➕ Add Products", "💰 Record Sale", "💾 Export"])
 
 with tab1:
@@ -128,13 +131,7 @@ with tab1:
         submitted = st.form_submit_button("Add Product")
         
         if submitted and product and sku:
-            new_item = {
-                "Product": product,
-                "SKU": sku,
-                "Quantity": quantity,
-                "Price": price,
-                "Reorder Level": reorder_level
-            }
+            new_item = {"Product": product, "SKU": sku, "Quantity": quantity, "Price": price, "Reorder Level": reorder_level}
             st.session_state.inventory.append(new_item)
             st.success(f"Added {product}!")
             st.rerun()
@@ -157,21 +154,13 @@ with tab2:
                 sale_submitted = st.form_submit_button("Record Sale")
                 
                 if sale_submitted:
-                    # Find and update inventory
                     for item in st.session_state.inventory:
                         if item["Product"] == selected_product:
                             item["Quantity"] -= quantity_sold
                             break
                     
-                    # Record the sale
-                    sale_record = {
-                        "Product": selected_product,
-                        "Quantity": quantity_sold,
-                        "Unit Price": price,
-                        "Revenue": quantity_sold * price
-                    }
+                    sale_record = {"Product": selected_product, "Quantity": quantity_sold, "Unit Price": price, "Revenue": quantity_sold * price}
                     st.session_state.sales.append(sale_record)
-                    
                     st.success(f"Sale recorded! Revenue: ${quantity_sold * price:.2f}")
                     st.rerun()
     else:
@@ -192,11 +181,9 @@ with tab3:
     if not sales:
         st.info("No sales recorded yet.")
 
-# Sales history
 if sales:
     st.subheader("📊 Recent Sales")
     st.dataframe(sales_df, use_container_width=True)
 
-# Footer
 st.markdown("---")
 st.markdown("*Inventory Tracker Pro — Built by Agent Cram | [Get Support](mailto:cram@agentmail.to)*")

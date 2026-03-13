@@ -6,13 +6,9 @@ st.set_page_config(page_title="Inventory Tracker Pro", page_icon="📦")
 
 st.title("📦 Inventory Tracker Pro")
 
-# Initialize session state for data
+# Initialize session state for data (empty for new customers)
 if "inventory" not in st.session_state:
-    st.session_state.inventory = [
-        {"Product": "Widget A", "SKU": "WGT-001", "Quantity": 100, "Price": 19.99, "Reorder Level": 20},
-        {"Product": "Widget B", "SKU": "WGT-002", "Quantity": 50, "Price": 29.99, "Reorder Level": 15},
-        {"Product": "Gadget X", "SKU": "GDG-101", "Quantity": 200, "Price": 9.99, "Reorder Level": 50},
-    ]
+    st.session_state.inventory = []
 
 if "sales" not in st.session_state:
     st.session_state.sales = []
